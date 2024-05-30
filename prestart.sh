@@ -1,17 +1,17 @@
 #!/bin/bash
 echo "Running preload.sh"
 
-# Function to check if Ollama is installed and if llava:v1.6 is installed
+# Function to check if Ollama is installed and if llava:v1.6 & mxbai-embed-large are installed
 function check_ollama_installed {
     if command -v ollama &> /dev/null
     then
         echo "Ollama is already installed"
-        if ollama list | grep -q "llava:v1.6"
+        if ollama list | grep -q "llava:v1.6" && ollama list | grep -q "mxbai-embed-large"
         then
-            echo "Llava:v1.6 already installed"
+            echo "All required models are already installed"
             return 0
         else
-            echo "Llava:v1.6 is not installed"
+            echo "One or more required models are not installed"
             return 1
         fi
     else
@@ -72,6 +72,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     fi
     if [ $status -ne 0 ]; then
         ollama pull llava:v1.6
+        ollama pull mxbai-embed-large
     fi
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     check_ollama_installed
@@ -83,6 +84,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     fi
     if [ $status -ne 0 ]; then
         ollama pull llava:v1.6
+        ollama pull mxbai-embed-large
     fi
 else
     echo "Unsupported OS. Please install Ollama manually."

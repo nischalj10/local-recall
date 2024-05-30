@@ -11,14 +11,15 @@ function Check-OllamaInstalled {
     }
 }
 
-# Function to check if llava:v1.6 is installed
-function Check-LlavaInstalled {
-    $llavaVersion = ollama list | Select-String "llava:v1.6"
-    if ($llavaVersion) {
-        Write-Output "llava:v1.6 is already installed"
+# Function to check if llava:v1.6 & mxbai-embed-large are installed
+function Check-ModelInstalled {
+    $llavaInstalled = ollama list | Select-String "llava:v1.6"
+    $mxbaiInstalled = ollama list | Select-String "mxbai-embed-large"
+    if ($llavaInstalled -and $mxbaiInstalled) {
+        Write-Output "All required models are already installed"
         return $true
     } else {
-        Write-Output "llava:v1.6 is not installed"
+        Write-Output "One or more required models are not installed"
         return $false
     }
 }
@@ -40,6 +41,7 @@ if (-not (Check-OllamaInstalled)) {
     Setup-ServiceWindows
 }
 
-if (-not (Check-LlavaInstalled)) {
+if (-not (Check-ModelInstalled)) {
     ollama pull llava:v1.6
+    ollama pull mxbai-embed-large
 }
