@@ -2,6 +2,10 @@ import { desktopCapturer } from 'electron';
 import fs from 'fs';
 import path from 'path';
 import { PNG } from 'pngjs';
+import os from 'os'
+
+const appDataPath = path.join(os.homedir(), 'app-data', 'local-recall'); // Use OS home directory and AppData
+const screenshotsDir = path.join(appDataPath, 'screenshots');
 
 export const setupPeriodicScreenshot = () => {
     setInterval(() => {
@@ -20,7 +24,6 @@ const takeScreenshot = async () => {
         if (source && source.thumbnail) {
             const image = source.thumbnail.toPNG();
             const timestamp = new Date().getTime();
-            const screenshotsDir = path.join(__dirname, 'screenshots');
             const screenshotPath = path.join(screenshotsDir, `${timestamp}.png`);
 
             // Ensure the directory exists
@@ -40,9 +43,9 @@ const takeScreenshot = async () => {
         console.error('Error taking screenshot:', error);
     }
 };
-  
+
 // Ensure the screenshots directory exists
-fs.mkdir(path.join(__dirname, 'screenshots'), { recursive: true }, (err) => {
+fs.mkdir(screenshotsDir, { recursive: true }, (err) => {
     if (err) console.log(`Failed to create screenshots directory: ${err}`);
 });
 
@@ -54,7 +57,7 @@ const isSignificantSimilarity = async (currentImage: Buffer, screenshotsDir: str
     }
     try {
         const files = await fs.promises.readdir(screenshotsDir);
-        const recentFiles = files.filter(file => file.endsWith('.png')).slice(-10); // Get the last 10 PNG files
+        const recentFiles = files.filter(file => file.endsWith('.png')).slice(-50); // Get the last 10 PNG files
 
         // if there are no recent files (i.e screenshot dir is empty - take the screenshot)
         if (recentFiles.length == 0) {
@@ -86,13 +89,12 @@ const isSignificantSimilarity = async (currentImage: Buffer, screenshotsDir: str
             const changePercentage = (pixelDiffCount / totalPixels) * 100;
             const similarityPercentage = 100 - changePercentage;
 
-            if (similarityPercentage > 80) {
-                // console.log(`Very similar with ${file}: ${similarityPercentage}% - so no SS`);
+            if (similarityPercentage > 75) {
+                console.log(`Very similar with ${file}: ${similarityPercentage}% - so no SS`);
                 return true;
-                break;
             }
         }
-        // console.log("No significant similarity detected - capturing SS")
+        //console.log("No significant similarity detected - capturing SS")
         return false;
     } catch(error) {
         console.error('Failed to read directory:', error);

@@ -1,6 +1,6 @@
 import { app, BrowserWindow } from 'electron';
 import path from 'path';
-import { setupPeriodicScreenshot } from './bg_processes/screenshot';
+import { setupPeriodicScreenshot } from './services/screenshot';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
