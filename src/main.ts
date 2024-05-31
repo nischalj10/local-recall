@@ -1,6 +1,6 @@
 import { app, BrowserWindow } from 'electron';
 import path from 'path';
-import { setupPeriodicScreenshot } from './services/screenshot';
+import { startServer, stopServer } from './server';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -33,7 +33,7 @@ const createWindow = () => {
 // Some APIs can only be used after this event occurs.
 app.on('ready', () => {
   createWindow();
-  setupPeriodicScreenshot();
+  startServer();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -41,6 +41,7 @@ app.on('ready', () => {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
+    stopServer();
     app.quit();
   }
 });
