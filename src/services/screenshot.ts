@@ -57,7 +57,7 @@ const isSignificantSimilarity = async (currentImage: Buffer, screenshotsDir: str
     }
     try {
         const files = await fs.promises.readdir(screenshotsDir);
-        const recentFiles = files.filter(file => file.endsWith('.png')).slice(-50); // Get the last 10 PNG files
+        const recentFiles = files.filter(file => file.endsWith('.png')).slice(-50); // Get the last 50 PNG files
 
         // if there are no recent files (i.e screenshot dir is empty - take the screenshot)
         if (recentFiles.length == 0) {
