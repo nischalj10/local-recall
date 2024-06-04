@@ -119,7 +119,7 @@ export const processScreenshotQueue = async() => {
                 // generate img description
                 const img = imageBuffer.toString('base64');
                 const desc = await generateDescription(img);
-                //console.log(desc.message.content)
+                console.log(desc.message.content)
 
                 // generate embedding of description
                 const emb = await generateEmbedding(desc.message.content)
@@ -140,20 +140,5 @@ export const processScreenshotQueue = async() => {
             await new Promise(resolve => setTimeout(resolve, 5000))
         }
     }
-    try {
-        console.log('Starting batch process')
-        const oneMinuteAgo = new Date().getTime() - 60000
-        const screenshotsToProcess = screenshotQueue.filter(s => s.timestamp > oneMinuteAgo)
-        console.log('screenshots to process - ', screenshotsToProcess)
-        for (const ss of screenshotsToProcess) {
-            console.log('Processing ss - ', ss.path)
-            
-        }
-        screenshotQueue = screenshotQueue.filter(s => s.timestamp > oneMinuteAgo)
-        
-    } catch (error) {
-        console.log('Error processing screenshot queue', error)
-    }
-
 }
   
