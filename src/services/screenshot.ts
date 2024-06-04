@@ -11,14 +11,10 @@ const screenshotsDir = path.join(appDataPath, 'screenshots');
 let screenshotQueue: {path: string, timestamp: number}[] = []
 
 export const setupPeriodicScreenshot = () => {
-    setInterval(() => takeScreenshot(), 5000);
+    setInterval(() => takeScreenshotAndStore(), 5000);
 };
 
-export const setupScreenshotBatchProcessing = async() => {
-    setInterval(() => processScreenshotQueue(), 60000);
-}
-
-const takeScreenshot = async () => {
+const takeScreenshotAndStore = async () => {
     try {
         const sources = await desktopCapturer.getSources({ 
             types: ['screen'],
@@ -113,7 +109,37 @@ const isSignificantSimilarity = async (currentImage: Buffer, screenshotsDir: str
     }
 };
 
-const processScreenshotQueue = async() => {
+export const processScreenshotQueue = async() => {
+    while(true) {
+        if (screenshotQueue.length > 0) {
+            try {
+                const ss = screenshotQueue.shift()
+                console.log('Processing ss - ', ss.path)
+                const imageBuffer = fs.readFileSync(ss.path)
+                // generate img description
+                const img = imageBuffer.toString('base64');
+                const desc = await generateDescription(img);
+                //console.log(desc.message.content)
+
+                // generate embedding of description
+                const emb = await generateEmbedding(desc.message.content)
+
+                // save embeddings to db
+                try {
+                    await addToDB(ss.path, desc.message.content, emb)
+                    console.log("saved to vector db")
+                } catch (err) {
+                    console.log(err)
+                }
+            } catch (error) {
+                console.log("Error processing screenshot queue", error)
+            }
+
+        } else {
+            // wait for 5 seconds if queue is empty  
+            await new Promise(resolve => setTimeout(resolve, 5000))
+        }
+    }
     try {
         console.log('Starting batch process')
         const oneMinuteAgo = new Date().getTime() - 60000
@@ -121,23 +147,7 @@ const processScreenshotQueue = async() => {
         console.log('screenshots to process - ', screenshotsToProcess)
         for (const ss of screenshotsToProcess) {
             console.log('Processing ss - ', ss.path)
-            const imageBuffer = fs.readFileSync(ss.path)
-             
-            // generate img description
-             const img = imageBuffer.toString('base64');
-             const desc = await generateDescription(img);
-             //console.log(desc.message.content)
-
-             //generate embedding of description
-             const emb = await generateEmbedding(desc.message.content)
-
-             //save embeddings to db
-             try {
-                 await addToDB(ss.path, desc.message.content, emb)
-                 console.log("saved to vector db")
-             } catch (err) {
-                 console.log(err)
-             }
+            
         }
         screenshotQueue = screenshotQueue.filter(s => s.timestamp > oneMinuteAgo)
         
