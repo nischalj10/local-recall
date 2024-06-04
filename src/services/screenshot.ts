@@ -34,6 +34,7 @@ const takeScreenshot = async () => {
             if (!(await isSignificantSimilarity(image, screenshotsDir))) //if there is significant similarity between the current ss and the last 10 - we do not save it. 
             {
                 fs.writeFile(screenshotPath, image, (err) => {
+                    // Todo naman:  screenshot can be comressed while saving and again decompressed while fetching to save disk space
                     if (err) return console.log(`Failed to save screenshot: ${err}`);
                     console.log(`Screenshot saved to ${screenshotPath}`);
                 });
