@@ -15,7 +15,7 @@ export const setupPeriodicScreenshot = () => {
 };
 
 export const setupScreenshotBatchProcessing = async() => {
-    setInterval(() => processScreenshotQueue(), 30000);
+    setInterval(() => processScreenshotQueue(), 60000);
 }
 
 const takeScreenshot = async () => {
@@ -116,7 +116,7 @@ const isSignificantSimilarity = async (currentImage: Buffer, screenshotsDir: str
 const processScreenshotQueue = async() => {
     try {
         console.log('Starting batch process')
-        const oneMinuteAgo = new Date().getTime() - 30000
+        const oneMinuteAgo = new Date().getTime() - 60000
         const screenshotsToProcess = screenshotQueue.filter(s => s.timestamp > oneMinuteAgo)
         console.log('screenshots to process - ', screenshotsToProcess)
         for (const ss of screenshotsToProcess) {

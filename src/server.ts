@@ -1,5 +1,5 @@
 import express from 'express';
-import { setupPeriodicScreenshot } from './services/screenshot';
+import { setupPeriodicScreenshot, setupScreenshotBatchProcessing } from './services/screenshot';
 import * as lancedb from "vectordb";
 import { vector_store_schema } from './services/vectordb';
 
@@ -30,6 +30,7 @@ export async function startServer() {
   });
 
   setupPeriodicScreenshot();
+  setupScreenshotBatchProcessing();
 }
 
 // function to stop the server
