@@ -42,7 +42,6 @@
   "author": "ubuntu",
   "license": "MIT",
   "dependencies": {
-    "apache-arrow": "^16.1.0",
     "electron-squirrel-startup": "^1.0.1",
     "express": "^4.19.2",
     "ollama": "^0.5.1",
