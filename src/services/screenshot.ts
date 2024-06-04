@@ -8,18 +8,17 @@ import { addToDB } from './vectordb';
 
 const appDataPath = path.join(os.homedir(), 'app-data', 'local-recall');
 const screenshotsDir = path.join(appDataPath, 'screenshots');
-
-let queue = Promise.resolve();
+let screenshotQueue: {path: string, timestamp: number}[] = []
 
 export const setupPeriodicScreenshot = () => {
-    setInterval(() => {
-        queue = queue.then(() => takeScreenshotAndEmbed()).catch((error) => {
-            console.error('Error in screenshot queue:', error);
-        });
-    }, 5000);
+    setInterval(() => takeScreenshot(), 5000);
 };
 
-const takeScreenshotAndEmbed = async () => {
+export const setupScreenshotBatchProcessing = async() => {
+    setInterval(() => processScreenshotQueue(), 30000);
+}
+
+const takeScreenshot = async () => {
     try {
         const sources = await desktopCapturer.getSources({ 
             types: ['screen'],
@@ -42,26 +41,12 @@ const takeScreenshotAndEmbed = async () => {
                 
                 //save screenshot
                 fs.writeFile(screenshotPath, image, (err) => {
-                    // Todo naman:  screenshot can be comressed while saving and again decompressed while fetching to save disk space
+                    // Todo naman:  screenshot can be compressed while saving and again decompressed while fetching to save disk space
                     if (err) return console.log(`Failed to save screenshot: ${err}`);
                     console.log(`Screenshot saved to ${screenshotPath}`);
+                    // Add to queue for batch processing later. 
+                    screenshotQueue.push({path: screenshotPath, timestamp: timestamp})
                 });  
-
-                // generate img description
-                const img = image.toString('base64');
-                const desc = await generateDescription(img);
-                console.log(desc.message.content)
-
-                //generate embedding of description
-                const emb = await generateEmbedding(desc.message.content)
-
-                //save to db
-                try {
-                    await addToDB(screenshotPath, desc.message.content, emb)
-                    console.log("saved to vector db")
-                } catch (err) {
-                    console.log(err)
-                }
             }
         }
     } catch (error) {
@@ -127,4 +112,38 @@ const isSignificantSimilarity = async (currentImage: Buffer, screenshotsDir: str
         return false;
     }
 };
+
+const processScreenshotQueue = async() => {
+    try {
+        console.log('Starting batch process')
+        const oneMinuteAgo = new Date().getTime() - 30000
+        const screenshotsToProcess = screenshotQueue.filter(s => s.timestamp > oneMinuteAgo)
+        console.log('screenshots to process - ', screenshotsToProcess)
+        for (const ss of screenshotsToProcess) {
+            console.log('Processing ss - ', ss.path)
+            const imageBuffer = fs.readFileSync(ss.path)
+             
+            // generate img description
+             const img = imageBuffer.toString('base64');
+             const desc = await generateDescription(img);
+             //console.log(desc.message.content)
+
+             //generate embedding of description
+             const emb = await generateEmbedding(desc.message.content)
+
+             //save embeddings to db
+             try {
+                 await addToDB(ss.path, desc.message.content, emb)
+                 console.log("saved to vector db")
+             } catch (err) {
+                 console.log(err)
+             }
+        }
+        screenshotQueue = screenshotQueue.filter(s => s.timestamp > oneMinuteAgo)
+        
+    } catch (error) {
+        console.log('Error processing screenshot queue', error)
+    }
+
+}
   
