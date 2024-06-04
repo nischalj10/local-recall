@@ -71,6 +71,7 @@ const isSignificantSimilarity = async (currentImage: Buffer, screenshotsDir: str
             const current = PNG.sync.read(currentImage);
 
             let pixelDiffCount = 0;
+            //TODO naman: we can skip taking screenshot if it page is say 98% similar? 
             const step = 1; // Compare every other pixel for efficiency
 
             for (let y = 0; y < current.height; y += step) {
