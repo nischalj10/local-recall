@@ -1,10 +1,10 @@
 import { desktopCapturer } from 'electron';
 import fs from 'fs';
 import path from 'path';
-import { PNG } from 'pngjs';
 import os from 'os'
 import { generateDescription, generateEmbedding } from './embedding';
 import { addToDB } from './vectordb';
+import sharp from 'sharp';
 
 const appDataPath = path.join(os.homedir(), 'app-data', 'local-recall');
 const screenshotsDir = path.join(appDataPath, 'screenshots');
@@ -38,10 +38,32 @@ const takeScreenshotAndStore = async () => {
                 //save screenshot
                 fs.writeFile(screenshotPath, image, (err) => {
                     // Todo naman:  screenshot can be compressed while saving and again decompressed while fetching to save disk space
-                    if (err) return console.log(`Failed to save screenshot: ${err}`);
-                    console.log(`Screenshot saved to ${screenshotPath}`);
-                    // Add to queue for batch processing later. 
-                    screenshotQueue.push({path: screenshotPath, timestamp: timestamp})
+                    if (err) {
+                        console.log(`Failed to save screenshot: ${err}`);
+                        return;
+                    }
+                    // Check the size of the saved image file
+                    fs.stat(screenshotPath, (err, stats) => {
+                        if (err) {
+                            console.error(`Failed to get file stats: ${err}`);
+                            return;
+                        }
+                        
+                        if (stats.size === 0) {
+                            // If the file size is 0 KB, delete the file
+                            fs.unlink(screenshotPath, (err) => {
+                                if (err) {
+                                    console.error(`Failed to delete empty file: ${err}`);
+                                } else {
+                                    console.warn(`Deleted empty file: ${screenshotPath}`);
+                                }
+                            });
+                        } else {
+                            console.log(`Screenshot saved to ${screenshotPath}`);
+                            // Add to queue for batch processing later. 
+                            screenshotQueue.push({path: screenshotPath, timestamp: timestamp});
+                        }
+                    });
                 });  
             }
         }
@@ -73,16 +95,15 @@ const isSignificantSimilarity = async (currentImage: Buffer, screenshotsDir: str
         for (const file of recentFiles) {
             const lastImagePath = path.join(screenshotsDir, file);
             const lastImageBuffer = await fs.promises.readFile(lastImagePath);
-            const lastImage = PNG.sync.read(lastImageBuffer);
-            const current = PNG.sync.read(currentImage);
+            const lastImage = await sharp(lastImageBuffer).raw().toBuffer({ resolveWithObject: true });
+            const current = await sharp(currentImage).raw().toBuffer({ resolveWithObject: true });
 
             let pixelDiffCount = 0;
-            //TODO naman: we can skip taking screenshot if it page is say 98% similar? 
             const step = 1; // Compare every other pixel for efficiency
 
-            for (let y = 0; y < current.height; y += step) {
-                for (let x = 0; x < current.width; x += step) {
-                    const idx = (current.width * y + x) << 2;
+            for (let y = 0; y < current.info.height; y += step) {
+                for (let x = 0; x < current.info.width; x += step) {
+                    const idx = (current.info.width * y + x) << 2;
                     if (current.data[idx] !== lastImage.data[idx] || // Red
                         current.data[idx + 1] !== lastImage.data[idx + 1] || // Green
                         current.data[idx + 2] !== lastImage.data[idx + 2] || // Blue
@@ -92,7 +113,7 @@ const isSignificantSimilarity = async (currentImage: Buffer, screenshotsDir: str
                 }
             }
 
-            const totalPixels = (current.width * current.height) / (step * step);
+            const totalPixels = (current.info.width * current.info.height) / (step * step);
             const changePercentage = (pixelDiffCount / totalPixels) * 100;
             const similarityPercentage = 100 - changePercentage;
 
