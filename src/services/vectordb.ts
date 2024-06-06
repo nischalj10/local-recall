@@ -10,7 +10,7 @@ export const vector_store_schema = new Schema([
   new Field("timestamp", new Timestamp(TimeUnit.MILLISECOND))
 ]);
 
-export async function addToDB(ss_path:any, ss_desc:any, ss_desc_emb:any) {
+export async function addToDB(ss_path: string, ss_desc:string, ss_desc_emb:any) {
 
   if (ss_desc_emb.embedding.length !== 1024) {
     throw new Error(`Embedding length must be 1024, but got ${ss_desc_emb.embedding.length}`);
