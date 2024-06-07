@@ -4,9 +4,11 @@ import * as lancedb from "vectordb";
 import { vector_store_schema } from './services/vectordb';
 import {processQuery} from './services/retrieve'
 import fs from 'fs' 
+import cors from 'cors';
 
 // setup express
 const server = express();
+server.use(cors());
 let expressServer:any = null;
 const PORT = 8337;
 const uri = "~/app-data/local-recall/db";
@@ -15,8 +17,11 @@ server.get('/', (req, res) => {
   res.send('Electron Express server is running!');
 });
 
+server.use('/images', express.static('/Users/namanjain/app-data/local-recall/screenshots'));
+
 server.get('/search', async (req, res) => {
   const query = req.query.q 
+  console.log("api called", query)
   if (typeof query == 'string' && query.trim() !== ''){
     try {
       console.log('Postman query', query)
@@ -38,7 +43,6 @@ server.get('/search', async (req, res) => {
   } else {
     res.status(400).send('Invalid query')
   }
-
 })
 
 // start express server, the db and run screenshot service
