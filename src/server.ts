@@ -19,6 +19,7 @@ server.get('/search', async (req, res) => {
   const query = req.query.q 
   if (typeof query == 'string' && query.trim() !== ''){
     try {
+      console.log('Postman query', query)
       const {imagePath, imageDesc, timestamp} = await processQuery(query) 
       if (fs.existsSync(imagePath)) {
         res.json({

@@ -1,25 +1,31 @@
+import Replicate from 'replicate';
 const { default: ollama } = require('ollama');
 
 export async function generateDescription(img:string) {
+    const replicate = new Replicate({
+        auth: 'r8_KFxedtCRB9DTN4w9IhxI98emgDkNF1l27iqtA'
+    });
 
-    const messages = [{
-        role : 'system',
-        content:  `You are an expert image description generator. 
-        You are part of a critical system that looks at a desktop screenshot and provide a detailed description of what is the visual and written content in that screenshot.
-        Make sure to output details of what website/ app user is potentially using, what is the content on the screen and what is it about. 
-        Only provide the description, nothing else. Be brief yet cover all major aspects in the description.`,
-    },
-    {
-        role : 'user',
-        content : 'Generate description of the attached screenshot',
-        images : [img]
-    }]
+    const input = {
+        top_k: 1,
+        top_p: 1,
+        prompt: "please describe this image.",
+        max_tokens: 45000,
+        temperature: 0.1,
+        image_base64: [img],
+        system_prompt: "You are a helpful AI assistant.",
+        max_new_tokens: 250,
+        repetition_penalty: 1.1
+    };
 
-    const desc = await ollama.chat({
-        model : 'llava:v1.6',
-        messages: messages
-    })
-    return desc
+    // let description = '';
+    // for await (const event of replicate.stream("hayooucom/vision-model:6afc892d5aa00e0e0883dec30f7a766fcf515c64090def9d173093ac343c2438", { input })) {
+    //     description += event;
+    // }
+
+    const descriptionArray = await replicate.run("hayooucom/vision-model:6afc892d5aa00e0e0883dec30f7a766fcf515c64090def9d173093ac343c2438", { input });
+    const description = (descriptionArray as string[]).join("");
+    return description;
 }
 
 export async function generateEmbedding(desc:string) {
