@@ -15,24 +15,25 @@ server.get('/', (req, res) => {
   res.send('Electron Express server is running!');
 });
 
-// Api to receive user query. 
-// Step 1 - Take the query via api 
-// Step 2 - Generate emb of that query 
-// Step 3 - Need to pass that to lance db to get he top k embedding 
-// Step 3 - For now we will take a look at the top 1 embedding 
-// Step 4 - API should return corresponding screenshot which we got from lance db 
 server.get('/search', async (req, res) => {
   const query = req.query.q 
-  if (typeof query == 'string') {
-    const {imagePath, timestamp} = await processQuery(query) 
-    if (fs.existsSync(imagePath)) {
-      res.json({
-        imagePath: imagePath, 
-        timestamp: timestamp 
-      })
-    } else {
-      res.status(404).send('No relavant content found')
+  if (typeof query == 'string' && query.trim() !== ''){
+    try {
+      const {imagePath, imageDesc, timestamp} = await processQuery(query) 
+      if (fs.existsSync(imagePath)) {
+        res.json({
+          imagePath: imagePath, 
+          imageDesc: imageDesc,
+          timestamp: timestamp 
+        })
+      } else {
+        res.status(404).send('No relavant content found')
+      }
+    } catch (error) {
+      console.error(error)
+      res.status(500).send('An error occured while processing the query')
     }
+
   } else {
     res.status(400).send('Invalid query')
   }
