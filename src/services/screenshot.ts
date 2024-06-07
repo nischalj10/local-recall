@@ -140,14 +140,17 @@ export const processScreenshotQueue = async() => {
                 // generate img description
                 const img = imageBuffer.toString('base64');
                 const desc = await generateDescription(img);
-                console.log(desc.message.content)
+                //console.log(desc.message.content)
+                console.log(desc)
 
                 // generate embedding of description
-                const emb = await generateEmbedding(desc.message.content)
+                //const emb = await generateEmbedding(desc.message.content)
+                const emb = await generateEmbedding(desc)
 
                 // save embeddings to db
                 try {
-                    await addToDB(ss.path, desc.message.content, emb)
+                    //await addToDB(ss.path, desc.message.content, emb)
+                    await addToDB(ss.path, desc, emb)
                     console.log("saved to vector db")
                 } catch (err) {
                     console.log(err)
