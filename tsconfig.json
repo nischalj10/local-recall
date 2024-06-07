@@ -11,6 +11,11 @@
     "outDir": "dist",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "jsx": "react"
+    "jsx": "react",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
   }
 }
