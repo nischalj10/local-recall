@@ -61,7 +61,7 @@ const takeScreenshotAndStore = async () => {
                         } else {
                             console.log(`Screenshot saved to ${screenshotPath}`);
                             // Add to queue for batch processing later. 
-                            screenshotQueue.push({path: screenshotPath, timestamp: timestamp});
+                            // screenshotQueue.push({path: screenshotPath, timestamp: timestamp});
                         }
                     });
                 });  
