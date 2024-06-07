@@ -5,9 +5,10 @@ export async function generateDescription(img:string) {
     const messages = [{
         role : 'system',
         content:  `You are an expert image description generator. 
-        You are part of a critical system that looks at a desktop screenshot and provide a detailed description of what is the visual and written content in that screenshot.
-        Make sure to output details of what website/ app user is potentially using, what is the content on the screen and what is it about. 
-        Only provide the description, nothing else. Be brief yet cover all major aspects in the description.`,
+        You are part of a critical system that looks at screenshots and provide a detailed description of what is the visual and written content in that screenshot.
+        Correctly identify the app/ website present in the screenshot. 
+        Give a description of what is the content on the screen and what is it about. 
+        Think long before you respond and be highy accurate`,
     },
     {
         role : 'user',
@@ -16,7 +17,7 @@ export async function generateDescription(img:string) {
     }]
 
     const desc = await ollama.chat({
-        model : 'llava:v1.6',
+        model : 'minicpm-v2.5-small',
         messages: messages
     })
     return desc
