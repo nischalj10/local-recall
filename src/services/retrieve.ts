@@ -8,6 +8,7 @@ export async function processQuery(query: string): Promise<{imagePath: string, i
         const emb = await generateEmbedding(query)
         // Get results from db 
         const result = await searchDB(emb)
+        console.log(result)
         // Return the path and timestamp
         return {
             imagePath: result[0].ss_path,
