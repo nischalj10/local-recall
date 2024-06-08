@@ -2,10 +2,10 @@ import Replicate from 'replicate';
 const { default: ollama } = require('ollama');
 
 export async function generateDescription(img:string) {
+    // Todo: This is temp as the local model is buggy. Check prev commit 
     const replicate = new Replicate({
         auth: 'r8_KFxedtCRB9DTN4w9IhxI98emgDkNF1l27iqtA'
     });
-
     const input = {
         top_k: 1,
         top_p: 1,
