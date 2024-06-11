@@ -14,7 +14,7 @@ const openai = new OpenAI({
 export async function generateDescription(img:string) {
     // Todo: This is temporary as the local model is buggy. Check prev commit. Putting api key here becuase of hurry to demo :) 
     const replicate = new Replicate({
-        auth: 'r8_ZENZPHG79E7q7QuukGVlKGX2fEqz9sQ0VnopU'   
+        auth: 'r8_ZENZPHG79E7q7QuukGVlKGX2fEqz9sQ0VnopU'
     });
     const input = {
         top_k: 1,

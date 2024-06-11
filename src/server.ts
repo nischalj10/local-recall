@@ -64,10 +64,6 @@ export async function startServer() {
 
   setupPeriodicScreenshot();
   processScreenshotQueue();
-
-  // Peding issues 
-  // 1. phi3 needs to run in local 
-  // 2. rag on phi3 should be good. This can be tested parallely with hosted model by putting or using some other account. 
 }
 
 // function to stop the server
