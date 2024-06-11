@@ -2,7 +2,7 @@ import Replicate from 'replicate'
 import ollama from 'ollama'
 
 export async function generateDescription(img:string) {
-    // Todo: This is temp as the local model is buggy. Check prev commit 
+    // Todo: This is temporary as the local model is buggy. Check prev commit. Putting api key here becuase of hurry to demo :) 
     const replicate = new Replicate({
         auth: 'r8_IKkvEFbV6fLu7YoUQmSqIoPhJU02kBV0tt5nY'
     });
