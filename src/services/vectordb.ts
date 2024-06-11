@@ -31,14 +31,14 @@ export const vector_store_schema = new Schema([
   new Field("id", new Int32()),
   new Field("ss_path", new Utf8()),
   new Field("ss_desc", new Utf8()),
-  new Field("ss_desc_emb", new FixedSizeList(1024, new Field('emb', new Float32()))),
+  new Field("vector", new FixedSizeList(1536, new Field('emb', new Float32())))
   new Field("timestamp", new Timestamp(TimeUnit.MILLISECOND))
 ]);
 
 export async function addToDB(ss_path: string, ss_desc:string, ss_desc_emb:any) {
   try {
-    if (ss_desc_emb.embedding.length !== 1024) {
-      throw new Error(`Embedding length must be 1024, but got ${ss_desc_emb.embedding.length}`)
+    if (ss_desc_emb.embedding.length !== 1536) {
+      throw new Error(`Embedding length must be 1536, but got ${ss_desc_emb.embedding.length}`)
     }
 
     const table = await getTable()
@@ -47,7 +47,7 @@ export async function addToDB(ss_path: string, ss_desc:string, ss_desc_emb:any) 
       id: Date.now(),
       ss_path: ss_path,
       ss_desc: ss_desc,
-      ss_desc_emb: ss_desc_emb.embedding,
+      vector: ss_desc_emb.embedding,
       timestamp: new Date()
     }];
     
@@ -63,7 +63,7 @@ export async function searchDB(emb: any): Promise<DBResult[]> {
   try {
     const table = await getTable()
     const results = await table.search(emb.embedding).limit(1).execute()
-    //console.log(results)
+    console.log(results)
     const mappedResults: DBResult[] = results.map((result:any) => ({
       ss_path: result.ss_path as string,
       ss_desc: result.ss_desc as string,

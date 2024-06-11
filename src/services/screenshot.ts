@@ -131,9 +131,12 @@ const isSignificantSimilarity = async (currentImage: Buffer, screenshotsDir: str
 };
 
 export const processScreenshotQueue = async() => {
+    console.log('I am here1')
     while(true) {
+        console.log('I am here2')
         if (screenshotQueue.length > 0) {
             try {
+                console.log('I am here3')
                 const ss = screenshotQueue.shift()
                 console.log('Processing ss - ', ss.path)
                 const imageBuffer = fs.readFileSync(ss.path)

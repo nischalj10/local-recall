@@ -1,10 +1,20 @@
 import Replicate from 'replicate'
-import ollama from 'ollama'
+import {Ollama} from 'ollama'
+import { OpenAI } from 'openai';
+import dotenv from 'dotenv'
+
+const ollama = new Ollama()
+dotenv.config()
+
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+    organization: process.env.OPENAI_ORGANIZATION
+})
 
 export async function generateDescription(img:string) {
     // Todo: This is temporary as the local model is buggy. Check prev commit. Putting api key here becuase of hurry to demo :) 
     const replicate = new Replicate({
-        auth: 'r8_IKkvEFbV6fLu7YoUQmSqIoPhJU02kBV0tt5nY'
+        auth: 'r8_ZENZPHG79E7q7QuukGVlKGX2fEqz9sQ0VnopU'
     });
     const input = {
         top_k: 1,
@@ -33,9 +43,14 @@ export async function generateDescription(img:string) {
 }
 
 export async function generateEmbedding(desc:string) {
-    const embedding = await ollama.embeddings({
-        model : 'mxbai-embed-large:latest',
-        prompt : desc,
-    })
-    return embedding
+    // const embedding = await ollama.embeddings({
+    //     model : 'mxbai-embed-large:latest',
+    //     prompt : desc,
+    // })
+    // console.log(embedding)
+    // return embedding
+    // TODO: This is temporary to test the querality of local models
+    const embedding = await openai.embeddings.create({input: desc, model: 'text-embedding-3-small'})
+    console.log(embedding)
+    return embedding.data[0]
 }
