@@ -17,7 +17,8 @@ server.get('/', (req, res) => {
   res.send('Electron Express server is running!');
 });
 
-server.use('/images', express.static('/Users/namanjain/app-data/local-recall/screenshots'));
+// TODO: use local system path
+server.use('/images', express.static('/Users/nischalj10/app-data/local-recall/screenshots'));
 
 server.get('/search', async (req, res) => {
   const query = req.query.q 
@@ -34,7 +35,7 @@ server.get('/search', async (req, res) => {
         })
       } else {
         res.status(404).send('No relavant content found')
-      }
+      } 
     } catch (error) {
       console.error(error)
       res.status(500).send('An error occured while processing the query')
@@ -63,6 +64,10 @@ export async function startServer() {
 
   setupPeriodicScreenshot();
   processScreenshotQueue();
+
+  // Peding issues 
+  // 1. phi3 needs to run in local 
+  // 2. rag on phi3 should be good. This can be tested parallely with hosted model by putting or using some other account. 
 }
 
 // function to stop the server
