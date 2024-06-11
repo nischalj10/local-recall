@@ -1,19 +1,19 @@
-import Replicate from 'replicate';
-const { default: ollama } = require('ollama');
+import Replicate from 'replicate'
+import ollama from 'ollama'
 
 export async function generateDescription(img:string) {
+    // Todo: This is temporary as the local model is buggy. Check prev commit. Putting api key here becuase of hurry to demo :) 
     const replicate = new Replicate({
-        auth: 'r8_KFxedtCRB9DTN4w9IhxI98emgDkNF1l27iqtA'
+        auth: 'r8_IKkvEFbV6fLu7YoUQmSqIoPhJU02kBV0tt5nY'
     });
-
     const input = {
         top_k: 1,
         top_p: 1,
-        prompt: "You are an expert image description generator. 
+        prompt: `You are an expert image description generator. 
         You are part of a critical system that looks at screenshots and provide a detailed description of what is the visual and written content in that screenshot.
         Correctly identify the app/ website present in the screenshot. 
         Give a description of what is the content on the screen and what is it about. 
-        Think long before you respond and be highy accurate",
+        Think long before you respond and be highy accurate`,
         max_tokens: 45000,
         temperature: 0.1,
         image_base64: [img],
