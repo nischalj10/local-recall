@@ -31,7 +31,7 @@ export const vector_store_schema = new Schema([
   new Field("id", new Int32()),
   new Field("ss_path", new Utf8()),
   new Field("ss_desc", new Utf8()),
-  new Field("vector", new FixedSizeList(1536, new Field('emb', new Float32())))
+  new Field("vector", new FixedSizeList(1536, new Field('emb', new Float32()))),
   new Field("timestamp", new Timestamp(TimeUnit.MILLISECOND))
 ]);
 
