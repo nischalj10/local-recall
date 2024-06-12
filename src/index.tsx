@@ -40,15 +40,15 @@ function App() {
       </h1>
 
       <div className="pt-2 relative mx-auto text-gray-600">
-        <input 
-          className="border-2 border-gray-200 bg-white h-12 px-5 pr-16 rounded-lg text-sm focus:outline-none"
+      <input 
+          className="border-2 border-gray-200 bg-white h-12 px-1 pr-1 rounded-lg text-sm focus:outline-none w-96"
           type="search" 
           name="search" 
           placeholder="recall your history.."
           value={searchQuery}
           onChange={handleInputChange}
           onKeyPress={handleKeyPress}
-        />
+/>
       </div>
 
       {imageData && (
